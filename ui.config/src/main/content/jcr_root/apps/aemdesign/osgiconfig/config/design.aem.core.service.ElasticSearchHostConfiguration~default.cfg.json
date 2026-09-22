@@ -1,0 +1,23 @@
+{
+  "host": "elasticsearch",
+  "port": 9200,
+  "protocol": "https",
+  "webconsole.configurationFactory.nameHint": "Host: elasticsearch",
+  "insecure": true,
+  "username": "elastic",
+  "password": "elastic",
+  "apiKey": "",
+  "authType": "basic",
+  "allowedSearchProxyPostPatterns": [
+    "^(aem-saas-site-content|aem-saas-site-content-test)/_search.*$",
+    "^(aem-saas-site-content|aem-saas-site-content-test)/_count.*$",
+    "^_search.*$",
+    "^_count.*$"
+  ],
+  "allowedSearchProxyGetPatterns": [
+    "^(aem-saas-site-content|aem-saas-site-content-test)/_doc/[\\\\w/-]+$",
+    "^(aem-saas-site-content|aem-saas-site-content-test)/_mapping$",
+    "^(aem-saas-site-content|aem-saas-site-content-test)/_settings$",
+    "^(aem-saas-site-content|aem-saas-site-content-test)$"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+    "version": 1,
+    "priority": 1,
+    "template": {
+        "settings": {
+            "index": {}
+        },
+        "mappings": {
+            "properties": {
+                "path": {
+                    "type": "text"
+                },
+                "docType": {
+                    "type": "text"
+                },
+                "lastModified": {
+                    "type": "date"
+                },
+                "publishedDate": {
+                    "type": "date"
+                },
+                "template": {
+                    "type": "text"
+                },
+                "title": {
+                    "type": "text"
+                },
+                "description": {
+                    "type": "text"
+                },
+                "body": {
+                    "type": "text"
+                },
+                "keywords": {
+                    "type": "keyword"
+                }
+            }
+        }
+    },
+    "index_patterns": [
+        "aem-saas-*"
+    ],
+    "composed_of": [],
+    "ignore_missing_component_templates": [],
+    "_meta": {
+        "description": "Generic AEM template for indexing AEM content"
+    }
+}
