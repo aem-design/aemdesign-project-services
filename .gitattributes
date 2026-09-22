@@ -1,0 +1,38 @@
+* text=auto eol=lf
+
+*.conf text
+*.vhost text
+*.rules text
+*.vars text
+*.any text
+magic text
+
+*.tgz -diff -merge -text
+*.jar -diff -merge -text
+*.zip -diff -merge -text
+*.jpg -diff -merge -text
+*.tar.gz -diff -merge -text
+*.jpeg -diff -merge -text
+*.tiff -diff -merge -text
+*.ico -diff -merge -text
+*.gif -diff -merge -text
+*.png -diff -merge -text
+original -diff -merge -text
+file -diff -merge -text
+folderThumbnail -diff -merge -text
+*.woff -diff -merge -text
+*.woff2 -diff -merge -text
+*.eot -diff -merge -text
+*.ttf -diff -merge -text
+*.mp4 -diff -merge -text
+*.flv -diff -merge -text
+*.m4v -diff -merge -text
+*.avi -diff -merge -text
+*.psd -diff -merge -text
+*.pdf -diff -merge -text
+*.3gp -diff -merge -text
+*.ogv -diff -merge -text
+*.webm -diff -merge -text
+*.wdmg -diff -merge -text
+*.svg -diff -merge -text
+*.sftmp -diff -merge -text

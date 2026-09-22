@@ -83,6 +83,9 @@ buildNumber.properties
 # Log files
 *.log
 
+# macOS metadata
+.DS_Store
+
 # NPM
 node_modules/
 yarn.lock
@@ -105,3 +108,16 @@ dispatcher/src/conf.d/variables/default.vars
 # Local packages
 _packages/
 logs/
+.vscode/
+.env.local
+
+# temp files
+_to_delete/
+
+# logs and reports
+.logs/
+.reports/
+
+# maven scratch
+.mvntmp/
+.m2/
