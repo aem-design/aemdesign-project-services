@@ -135,6 +135,108 @@ To start the full stack run the following command:
 
 This will start full stack and you can access project dashboard at [https://dashboard.localhost/](https://dashboard.localhost/).
 
+### DevOps helpers
+
+These scripts are the main local SaaS-style operations helpers for this project:
+
+- `./start.ps1` starts the stack and opens the dashboard
+- `./stop.ps1` stops the running stack without deleting data
+- `./status.ps1` shows compose service state, health, ports, and the key local URLs
+- `./logs.ps1` tails compose logs for one or more services, with aliases like `search`, `web`, and `all`
+- `./open.ps1` opens the current dashboard, author, publish, dispatcher, Kibana, Traefik, or Elasticsearch URL
+- `./verify.ps1` checks author, Elasticsearch, and then runs the Elasticsearch proxy smoke test
+- `./restart.dispatcher.ps1` rebuilds just the `dashboard` and `dispatcher` runtime path
+- `./reset.ps1` shuts the stack down and optionally prunes Docker resources and project volumes
+- `./clean.ps1` previews untracked generated files under `services` and `logs`
+- `./clean.ps1 -CLEAN` removes untracked generated files under `services` and `logs`
+
+The local stack now also includes the copied DevOps observability services from the existing project:
+
+- Elasticsearch
+- Kibana
+- Filebeat
+- Metricbeat
+- Logstash
+- `services/aem/wait-for-aem.sh`
+
+Notes:
+
+- `docker-compose-aem.yml` now respects the Traefik flags defined in `.env` instead of hardcoding them.
+- `dashboardbuild` is a one-shot builder service and no longer runs privileged.
+- `logstash` is currently configured as a batch-style ingestion job because `services/logstash/logstash.conf` uses `exit_after_read => true`.
+- local operator scripts now load `.env.local` automatically when present, so machine-specific port and secret overrides can stay out of the committed `.env`
+
+### Verify Elasticsearch Proxy
+
+Use the local smoke test to verify the AEM proxy endpoint and Elasticsearch are wired correctly end to end.
+
+Default local author on `4502`:
+
+```powershell
+./smoke-elasticsearch-proxy.ps1
+```
+
+If you are running the alternate-port author used during local verification, point the script at that author explicitly:
+
+```powershell
+./smoke-elasticsearch-proxy.ps1 -AemHost http://localhost:14512
+```
+
+What this verifies:
+
+- direct Elasticsearch access on `https://localhost:9200`
+- test index creation or reuse
+- test document write
+- AEM proxy metadata read at `/bin/elasticsearch.json/<index>`
+- AEM proxy `POST` search at `/bin/elasticsearch.json/<index>/_search`
+
+Expected successful ending:
+
+```text
+Smoke test passed.
+```
+
+For a higher-level local verification pass that checks author, Elasticsearch, and then runs the smoke test:
+
+```powershell
+./verify.ps1
+```
+
+Alternate-port author example:
+
+```powershell
+./verify.ps1 -AemHost http://localhost:14512
+```
+
+To see the current compose service state and the main local URLs:
+
+```powershell
+./status.ps1
+```
+
+To tail logs for the default local author service:
+
+```powershell
+./logs.ps1
+```
+
+To tail logs for the search stack or everything in the compose project:
+
+```powershell
+./logs.ps1 search -Follow
+./logs.ps1 all -Tail 100
+```
+
+To keep local-only port or secret overrides out of the committed `.env`, copy `.env.local.example` to `.env.local` and set your machine-specific values there. The local helper scripts and compose commands launched through them will pick those overrides up automatically.
+
+To open the current dashboard or one of the runtime URLs:
+
+```powershell
+./open.ps1
+./open.ps1 author
+./open.ps1 all
+```
+
 ### Install Content Packages
 
 Firstly get content from Dev environment and put it into `_packages` folder then update `package-install.txt` with file you have.
@@ -387,7 +489,7 @@ GIT_REPO_ADOBE_TITLE="Adobe Git"
 - deploy.frontend.ps1 (only deploy apps and frontend module)
 - deploy.ps1 (deploy script)
 - dev-token.json (json file with your Adobe IMS token)
-- docker-compose.yaml (docker compose file)
+- docker-compose.yml (entry point; includes docker-compose-aem.yml + docker-compose-elasticsearch.yml)
 - functions.ps1 (helper functions)
 - install_packages.ps1 (auto install packages to author and publish using package.ps1)
 - local-token.txt (text file with admin:admin in base64)

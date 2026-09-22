@@ -48,7 +48,7 @@ foreach ($PACKAGE in $PACKAGE_LIST) {
 
     if (-not($LOCAL)) {
         $SOURCE_HOST = $DESTINATION_AEM_HOST_URL
-        $HEADER_AUTH_TOKEN = $DESTINATION_AEM_TOKEN
+        $HEADER_AUTH_TOKEN = $DESTINATION_AEM_HOST_HEADER
     }
     printSectionLine  "LOCAL: $LOCAL"
     printSectionLine  "PACKAGE_FILE: $PACKAGE_FILE"
@@ -62,7 +62,6 @@ foreach ($PACKAGE in $PACKAGE_LIST) {
 
     printSectionLine  "Package uploaded $PACKAGE"
 }
-
 
 
 
