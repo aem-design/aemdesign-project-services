@@ -155,4 +155,22 @@ Include conf.d/variables/custom.vars
     Header set Cache-Control "max-age=300,stale-while-revalidate=604800,stale-if-error=604800" "expr=%{REQUEST_STATUS} < 400"
     Header set Age 0
   </LocationMatch>
+  # ---------------------------------------------------------------------------
+  # Edge Side Includes (ESI)
+  #
+  # The gate the CDN honours: services/varnish/default.vcl only sets do_esi when
+  # a response carries "x-aem-esi: on", so a path that would not assemble in
+  # production does not silently assemble locally either.
+  #
+  # "x-aem-esi on" with no esi tags in the page is a no-op, so leaving it on is
+  # safe. Cost of leaving it on: no-gzip means these paths travel uncompressed
+  # from dispatcher to CDN, so keep the LocationMatch scoped to the trees that
+  # will actually use includes - widen it deliberately, not by default.
+  # ---------------------------------------------------------------------------
+  <LocationMatch "^/content/aemdesign/.*\.html$">
+      SetEnv no-gzip 1
+      Header set x-aem-esi "on"
+      Header set x-aem-compress "on"
+  </LocationMatch>
+
 </VirtualHost>

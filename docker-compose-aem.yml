@@ -132,6 +132,53 @@ services:
   ##########################################################
 
   ##########################################################
+  # CDN START
+  ##########################################################
+  # Varnish standing in for Adobe's managed CDN, so ESI can actually be tested
+  # locally. Adobe's CDN is Fastly; Fastly's ESI is VCL ESI, which is Varnish
+  # ESI - same engine, same include/comment/remove subset, same refusal to parse
+  # a gzipped body.
+  #
+  # It sits in FRONT of the dispatcher on its own hostname rather than replacing
+  # it, so one run can show the same page unassembled (dispatcher) and assembled
+  # (cdn) side by side. Removing this service changes nothing about the
+  # dispatcher.
+  cdn:
+    image: ${CDN_IMAGE}
+    hostname: cdn
+    restart: unless-stopped
+    ports:
+      - ${CDN_PORT}:80
+    environment:
+      - TZ
+      - VARNISH_SIZE=${CDN_MEMORY}
+    # No tmpfs on /var/lib/varnish. Mounting one there gives a root-owned
+    # directory that varnishd, running as the varnish user, cannot create its
+    # working directory inside:
+    #   Error: Cannot create working directory '/var/lib/varnish/varnishd': Permission denied
+    # The image already ships that path with the right ownership.
+    labels:
+      traefik.enable: true
+      traefik.http.routers.cdn.rule: "Host(`${CDN_HOST}`) || HostRegexp(`^.+${CDN_HOST}`)"
+      traefik.http.routers.cdn.entrypoints: web
+      traefik.http.routers.cdn_https.rule: "Host(`${CDN_HOST}`) || HostRegexp(`^.+${CDN_HOST}`)"
+      traefik.http.routers.cdn_https.tls: true
+      traefik.http.routers.cdn_https.entrypoints: websecure
+      traefik.http.services.cdn.loadbalancer.server.port: 80
+      traefik.http.services.cdn.loadbalancer.passHostHeader: true
+    volumes:
+      - ./services/varnish/default.vcl:/etc/varnish/default.vcl:ro
+    depends_on:
+      - dispatcher
+    networks:
+      - dispatcher-network
+      - internal
+      - default
+  ##########################################################
+  # CDN END
+  ##########################################################
+
+  ##########################################################
   # PROXY START
   ##########################################################
   proxy:
@@ -298,6 +345,9 @@ services:
       - AUTHOR_LINKS
       - CONSOLE_LINKS
       - DISPATCHER_PORT
+      - CDN_URL
+      - CDN_HOST
+      - CDN_PORT
       - PROXY_PORT
       - ELASTIC_TITLE
       - ELASTIC_DESCRIPTION

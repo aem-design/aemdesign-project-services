@@ -221,6 +221,36 @@
       ]
     },
     {
+      "name": "CDN",
+      "logo": "varnish_cache_logo_icon_168300.png",
+      "desc": "Varnish in front of the dispatcher. Assembles ESI, which the dispatcher does not - this is the only local surface where edge includes resolve",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${CDN_URL}"
+        }
+      ],
+      "groups": [
+        {
+          "label": "Pages",
+          "source": "PAGE_LINKS",
+          "href": "https://{sub}.${CDN_HOST}{path}"
+        },
+        {
+          "label": "Showcase",
+          "source": "SHOWCASE_LINKS",
+          "href": "https://{sub}.${CDN_HOST}{path}"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${CDN_PORT}",
+          "href": "${DOMAIN_URL}:${CDN_PORT}"
+        }
+      ]
+    },
+    {
       "name": "Proxy",
       "logo": "squid_logo2.png",
       "desc": "Squid proxy used by the dispatcher for external services",
