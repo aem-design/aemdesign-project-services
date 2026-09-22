@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
 
   ##########################################################
@@ -22,7 +20,7 @@ services:
     environment:
       - TZ
       - AEM_RUNMODE=-Dsling.run.modes=author,crx3,crx3tar,dev,dynamicmedia_scene7,nosamplecontent
-      - AEM_JVM_OPTS=-server -Xms248m -Xmx4524m -XX:MaxDirectMemorySize=256M -XX:+CMSClassUnloadingEnabled -Djava.awt.headless=true -Dorg.apache.felix.http.host=0.0.0.0 -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:58242
+      - AEM_JVM_OPTS=-server -Xms248m -Xmx4524m -XX:MaxDirectMemorySize=256M -Djava.awt.headless=true -Dorg.apache.felix.http.host=0.0.0.0 -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:58242
       - AEM_PROXY_HOST=proxy
     volumes:
       - author-data:/aem/crx-quickstart/repository
@@ -70,7 +68,7 @@ services:
     environment:
       - TZ
       - AEM_RUNMODE=-Dsling.run.modes=publish,crx3,crx3tar,dev,dynamicmedia_scene7,nosamplecontent
-      - AEM_JVM_OPTS=-server -Xms248m -Xmx1524m -XX:MaxDirectMemorySize=256M -XX:+CMSClassUnloadingEnabled -Djava.awt.headless=true -Dorg.apache.felix.http.host=0.0.0.0 -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:58242
+      - AEM_JVM_OPTS=-server -Xms248m -Xmx1524m -XX:MaxDirectMemorySize=256M -Djava.awt.headless=true -Dorg.apache.felix.http.host=0.0.0.0 -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:58242
       - AEM_PROXY_HOST=proxy
     labels:
       # note that you want this frontend to match the last. otherwise, it will match login.${HOST_DOMAIN}"
@@ -178,11 +176,11 @@ services:
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL}"
       - "--accesslog=${TRAEFIK_ACCESS_LOG}"
-      - "--api.insecure=true" # Don't do that in production!
-      - "--api.dashboard=true" # Don't do that in production!
+      - "--api.insecure=${TRAEFIK_API_INSECURE}" # Don't do that in production!
+      - "--api.dashboard=${TRAEFIK_API_DASHBOARD}" # Don't do that in production!
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--global.sendAnonymousUsage=true"
+      - "--global.sendAnonymousUsage=${TRAEFIK_GLOBAL_SEND_ANONYMOUS_USAGE}"
 
 
       # Entrypoints for HTTP, HTTPS, and NX (TCP + UDP)
@@ -245,12 +243,34 @@ services:
   ##########################################################
   # DASHBOARD START
   ##########################################################
-  dashboardbuild:
-    image: ${DASHBOARD_BUILD_IMAGE}
-    privileged: true
+  dashboard:
+    image: ${DASHBOARD_IMAGE}
+    restart: unless-stopped
+    working_dir: /app
+    hostname: dashboard
+    command: node server.mjs
+    depends_on:
+      - traefik
+    labels:
+      traefik.frontend.priority: 1
+      traefik.enable: true
+      traefik.http.routers.dashboard.rule: "Host(`${DASHBOARD_HOST}`)"
+      traefik.http.routers.dashboard.entrypoints: web
+      traefik.http.routers.dashboard_https.rule: "Host(`${DASHBOARD_HOST}`)"
+      traefik.http.routers.dashboard_https.tls: true
+      traefik.http.routers.dashboard_https.entrypoints: websecure
+      traefik.http.services.dashboard.loadbalancer.server.port: ${DASHBOARD_PORT}
+      traefik.http.services.dashboard.loadbalancer.passHostHeader: true
+    volumes:
+      - ${DASHBOARD_SERVICE_PATH}:/app:ro
+      - ${CERTS_HOST_PATH}:/app/certs:ro
+    networks:
+      - internal
     environment:
       - TZ
-      - JEKYLL_ENV=production
+      - DASHBOARD_PORT
+      - DASHBOARD_TITLE
+      - DASHBOARD_CERTS_DIR
       - DOMAIN_URL
       - GIT_REPO
       - GIT_REPO_ADOBE
@@ -277,35 +297,23 @@ services:
       - SHOWCASE_LINKS
       - AUTHOR_LINKS
       - CONSOLE_LINKS
-    command: bash /srv/jekyll/build.sh
-    volumes:
-      - ${DASHBOARD_CONTENT_PATH}:/srv/jekyll:rw
-
-  dashboard:
-    image: ${DASHBOARD_IMAGE}
-    restart: unless-stopped
-    working_dir: /content
-    hostname: dashboard
-    depends_on:
-      - traefik
-      - dashboardbuild
-    labels:
-      traefik.frontend.priority: 1
-      traefik.enable: true
-      traefik.http.routers.dashboard.rule: "Host(`${DASHBOARD_HOST}`)"
-      traefik.http.routers.dashboard.entrypoints: web
-      traefik.http.routers.dashboard_https.rule: "Host(`${DASHBOARD_HOST}`)"
-      traefik.http.routers.dashboard_https.tls: true
-      traefik.http.routers.dashboard_https.entrypoints: websecure
-      traefik.http.services.dashboard.loadbalancer.server.port: 80
-      traefik.http.services.dashboard.loadbalancer.passHostHeader: true
-    volumes:
-      - ${DASHBOARD_CONTENT_PATH}/_site:/content
-      - ${DASHBOARD_CONFIG_FILE}:/etc/nginx/nginx.conf
-    environment:
-      - TZ
-    networks:
-      - internal
+      - DISPATCHER_PORT
+      - PROXY_PORT
+      - ELASTIC_TITLE
+      - ELASTIC_DESCRIPTION
+      - ELASTIC_IMAGE_SRC
+      - ELASTIC_URL
+      - ES_PORT
+      - KIBANA_TITLE
+      - KIBANA_DESCRIPTION
+      - KIBANA_IMAGE_SRC
+      - KIBANA_URL
+      - KIBANA_PORT
+      - LOGSTASH_PORT
+      - FILEBEAT_PORT
+      - METRICBEAT_PORT
+      - MONGO_PORT
+      - LOCALHOST_URL
   ##########################################################
   # DASHBOARD END
   ##########################################################

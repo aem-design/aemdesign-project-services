@@ -1,0 +1,9 @@
+# Single entry point for the stack.
+#
+# `docker compose <cmd>` with no -f flags picks this file up and pulls in the
+# two stack files below. There is deliberately no docker-compose.yaml beside
+# it: Compose refuses to start when both .yml and .yaml are present.
+include:
+  - path:
+      - docker-compose-aem.yml
+      - docker-compose-elasticsearch.yml
