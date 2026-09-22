@@ -1,0 +1,392 @@
+{
+  "page": {
+    "title": "${DASHBOARD_TITLE}",
+    "subtitle": "Local development stack — links rendered live from .env.",
+    "logo": "site.png"
+  },
+  "defaults": {
+    "DASHBOARD_TITLE": "AEM Project Services",
+    "LOCALHOST_URL": "http://localhost",
+    "DASHBOARD_CERTS_DIR": "certs"
+  },
+  "static": [
+    {
+      "prefix": "/certs/",
+      "dir": "${DASHBOARD_CERTS_DIR}",
+      "allow": [
+        "mkcert.pfx",
+        "rootCA.pem"
+      ],
+      "download": true
+    },
+    {
+      "prefix": "/vendor/",
+      "dir": "public/vendor",
+      "cache": "public, max-age=31536000, immutable"
+    },
+    {
+      "prefix": "/",
+      "dir": "public"
+    }
+  ],
+  "lists": {
+    "delimiter": "|",
+    "separator": ",",
+    "fields": [
+      "path",
+      "title",
+      "icon",
+      "sub"
+    ]
+  },
+  "brandIcons": [
+    "adobe",
+    "git",
+    "git-alt",
+    "github",
+    "gitlab",
+    "bitbucket",
+    "jira",
+    "confluence",
+    "atlassian",
+    "microsoft",
+    "windows",
+    "google",
+    "docker",
+    "aws",
+    "apple",
+    "linux",
+    "node-js",
+    "npm",
+    "js",
+    "java",
+    "slack",
+    "figma",
+    "jenkins",
+    "elastic"
+  ],
+  "iconAliases": {
+    "fa-adobe": "fa-cloud"
+  },
+  "rows": [
+    {
+      "name": "Environment Links",
+      "glyph": "fa-globe",
+      "desc": "Adobe Cloud Manager environments and consoles",
+      "groups": [
+        {
+          "label": "Author instances",
+          "source": "AUTHOR_LINKS",
+          "href": "{path}"
+        },
+        {
+          "label": "Consoles",
+          "source": "CONSOLE_LINKS",
+          "href": "{path}"
+        }
+      ]
+    },
+    {
+      "name": "Author",
+      "logo": "aem-design.png",
+      "desc": "Local AEM author",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${AUTHOR_URL}"
+        },
+        {
+          "label": "CRX",
+          "icon": "fa-folder-tree",
+          "kind": "secondary",
+          "href": "${AUTHOR_URL}/crx/de"
+        },
+        {
+          "label": "Packages",
+          "icon": "fa-box-archive",
+          "kind": "secondary",
+          "href": "${AUTHOR_URL}/crx/packmgr"
+        },
+        {
+          "label": "Console",
+          "icon": "fa-terminal",
+          "kind": "secondary",
+          "href": "${AUTHOR_URL}/system/console"
+        },
+        {
+          "label": "Replication",
+          "icon": "fa-arrows-rotate",
+          "kind": "secondary",
+          "href": "${AUTHOR_URL}/etc/replication/agents.author/publish.html"
+        }
+      ],
+      "groups": [
+        {
+          "label": "Pages",
+          "source": "PAGE_LINKS",
+          "href": "${AUTHOR_URL}{path}?wcmmode=disabled"
+        },
+        {
+          "label": "Showcase",
+          "source": "SHOWCASE_LINKS",
+          "href": "${AUTHOR_URL}{path}?wcmmode=disabled"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${AUTHOR_PORT}",
+          "href": "${LOCALHOST_URL}:${AUTHOR_PORT}"
+        },
+        "${AUTHOR_DEBUG_PORT}"
+      ]
+    },
+    {
+      "name": "Publish",
+      "logo": "aem-design.png",
+      "desc": "Local AEM publish",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${PUBLISH_URL}"
+        },
+        {
+          "label": "CRX",
+          "icon": "fa-folder-tree",
+          "kind": "secondary",
+          "href": "${PUBLISH_URL}/crx/de"
+        },
+        {
+          "label": "Packages",
+          "icon": "fa-box-archive",
+          "kind": "secondary",
+          "href": "${PUBLISH_URL}/crx/packmgr"
+        },
+        {
+          "label": "Console",
+          "icon": "fa-terminal",
+          "kind": "secondary",
+          "href": "${PUBLISH_URL}/system/console"
+        }
+      ],
+      "groups": [
+        {
+          "label": "Pages",
+          "source": "PAGE_LINKS",
+          "href": "${PUBLISH_URL}{path}"
+        },
+        {
+          "label": "Showcase",
+          "source": "SHOWCASE_LINKS",
+          "href": "${PUBLISH_URL}{path}"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${PUBLISH_PORT}",
+          "href": "${LOCALHOST_URL}:${PUBLISH_PORT}"
+        },
+        "${PUBLISH_DEBUG_PORT}"
+      ]
+    },
+    {
+      "name": "Dispatcher",
+      "logo": "Apache_Feather_Logo.svg",
+      "desc": "Apache + dispatcher module, per-brand subdomains",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${DISPATCHER_URL}"
+        }
+      ],
+      "groups": [
+        {
+          "label": "Pages",
+          "source": "PAGE_LINKS",
+          "href": "https://{sub}.${DISPATCHER_HOST}{path}"
+        },
+        {
+          "label": "Showcase",
+          "source": "SHOWCASE_LINKS",
+          "href": "https://{sub}.${DISPATCHER_HOST}{path}"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${DISPATCHER_PORT}",
+          "href": "${DOMAIN_URL}:${DISPATCHER_PORT}"
+        }
+      ]
+    },
+    {
+      "name": "Proxy",
+      "logo": "squid_logo2.png",
+      "desc": "Squid proxy used by the dispatcher for external services",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${PROXY_URL}"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${PROXY_PORT}",
+          "href": "${DOMAIN_URL}:${PROXY_PORT}"
+        }
+      ]
+    },
+    {
+      "name": "${ELASTIC_TITLE}",
+      "logo": "${ELASTIC_IMAGE_SRC}",
+      "desc": "${ELASTIC_DESCRIPTION}",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${ELASTIC_URL}"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${ES_PORT}",
+          "href": "${DOMAIN_URL}:${ES_PORT}"
+        }
+      ]
+    },
+    {
+      "name": "${KIBANA_TITLE}",
+      "logo": "${KIBANA_IMAGE_SRC}",
+      "desc": "${KIBANA_DESCRIPTION}",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${KIBANA_URL}"
+        }
+      ],
+      "ports": [
+        {
+          "label": "${KIBANA_PORT}",
+          "href": "${DOMAIN_URL}:${KIBANA_PORT}"
+        }
+      ]
+    },
+    {
+      "name": "Logstash",
+      "logo": "logo-logstash-32-color.svg",
+      "desc": "Log pipeline into Elasticsearch. Internal only — no published port.",
+      "ports": [
+        "${LOGSTASH_PORT}"
+      ]
+    },
+    {
+      "name": "Filebeat",
+      "logo": "logo-beats-32-color.svg",
+      "desc": "Ships container and AEM logs to Logstash. Internal only — no published port.",
+      "ports": [
+        "${FILEBEAT_PORT}"
+      ]
+    },
+    {
+      "name": "Metricbeat",
+      "logo": "icon-metricbeat-color.svg",
+      "desc": "Ships host and container metrics to Elasticsearch. Internal only — no published port.",
+      "ports": [
+        "${METRICBEAT_PORT}"
+      ]
+    },
+    {
+      "name": "Mongo",
+      "logo": "mongodb.png",
+      "desc": "Document store. Not in compose yet — add the service to bring this up.",
+      "ports": [
+        "${MONGO_PORT}"
+      ]
+    },
+    {
+      "name": "Mongo Express",
+      "logo": "mongo-express.png",
+      "desc": "Web UI for Mongo. Not in compose yet — add the service to bring this up.",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "href": "${MONGOUI_URL}"
+        }
+      ]
+    },
+    {
+      "name": "Traefik",
+      "logo": "Traefik.logo.png",
+      "desc": "Edge router and TLS termination",
+      "buttons": [
+        {
+          "label": "Dashboard",
+          "icon": "fa-gauge-high",
+          "href": "${TRAEFIK_URL}/dashboard/"
+        }
+      ],
+      "ports": [
+        "${TRAEFIK_PORT_DASHBOARD}",
+        "${TRAEFIK_PORT_HTTP}",
+        "${TRAEFIK_PORT_HTTPS}"
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "logo": "nginx_icon.svg",
+      "desc": "This page",
+      "buttons": [
+        {
+          "label": "Open",
+          "icon": "fa-arrow-up-right-from-square",
+          "kind": "secondary",
+          "href": "${DASHBOARD_URL}"
+        }
+      ],
+      "ports": [
+        "${DASHBOARD_PORT}"
+      ]
+    },
+    {
+      "name": "Certificates",
+      "glyph": "fa-lock",
+      "desc": "Install the local CA so the https://*.localhost hosts are trusted. PFX password is CERTS_PASSWORD in .env",
+      "buttons": [
+        {
+          "label": "mkcert.pfx",
+          "icon": "fa-file-shield",
+          "href": "/certs/mkcert.pfx",
+          "download": true
+        },
+        {
+          "label": "rootCA.pem",
+          "icon": "fa-certificate",
+          "kind": "secondary",
+          "href": "/certs/rootCA.pem",
+          "download": true
+        }
+      ]
+    },
+    {
+      "name": "Git",
+      "glyph": "fa-code-branch",
+      "desc": "Source repositories for this project",
+      "buttons": [
+        {
+          "label": "${GIT_REPO_TITLE}",
+          "icon": "${GIT_REPO_ICON}",
+          "href": "${GIT_REPO}"
+        },
+        {
+          "label": "${GIT_REPO_ADOBE_TITLE}",
+          "icon": "${GIT_REPO_ADOBE_ICON}",
+          "href": "${GIT_REPO_ADOBE}"
+        }
+      ]
+    }
+  ]
+}

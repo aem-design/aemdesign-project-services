@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en-AU" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="icon" href="/favicon.ico">
+<script>
+// Runs before the stylesheet paints, so a dark-mode user never sees a white
+// flash. Three states: "system" (no data-theme attribute, so the
+// prefers-color-scheme rule in styles.css decides and keeps tracking the OS),
+// "light" and "dark" (explicit, and they win over the OS).
+(function () {
+  var el = document.documentElement;
+  el.classList.remove('no-js');
+  try {
+    var saved = localStorage.getItem('dashboard-theme');
+    if (saved === 'light' || saved === 'dark') el.setAttribute('data-theme', saved);
+  } catch (e) { /* storage blocked - fall back to system */ }
+})();
+</script>
+<link rel="stylesheet" href="/styles.css">
+<!-- Font Awesome is vendored under public/vendor so the stack renders with no network. -->
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>{{logo}} {{title}}</h1>
+      <p class="sub">{{subtitle}}</p>
+    </div>
+    <button type="button" id="theme-toggle" class="theme" aria-live="polite">
+      <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><span class="theme-label">System</span>
+    </button>
+  </div>
+  <table>
+    <thead>
+      <tr><th></th><th>Service</th><th>Description</th><th>Links</th><th>Ports</th></tr>
+    </thead>
+    <tbody>{{rows}}</tbody>
+  </table>
+  <footer>Rendered {{generated}} &middot; <a href="/healthz">/healthz</a></footer>
+</div>
+<script>
+// Cycles System -> Light -> Dark -> System. "System" removes the attribute and
+// the stored key, which hands control back to the prefers-color-scheme rule.
+(function () {
+  var KEY = 'dashboard-theme';
+  var MODES = [
+    { id: 'system', label: 'System', icon: 'fa-circle-half-stroke' },
+    { id: 'light', label: 'Light', icon: 'fa-sun' },
+    { id: 'dark', label: 'Dark', icon: 'fa-moon' }
+  ];
+
+  var button = document.getElementById('theme-toggle');
+  if (!button) return;
+  var glyph = button.querySelector('i');
+  var text = button.querySelector('.theme-label');
+
+  function read() {
+    try {
+      var saved = localStorage.getItem(KEY);
+      return saved === 'light' || saved === 'dark' ? saved : 'system';
+    } catch (e) { return 'system'; }
+  }
+
+  function write(id) {
+    try {
+      if (id === 'system') localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, id);
+    } catch (e) { /* storage blocked - the choice just will not persist */ }
+  }
+
+  function apply(id) {
+    var mode = MODES.filter(function (m) { return m.id === id; })[0] || MODES[0];
+    if (mode.id === 'system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', mode.id);
+    glyph.className = 'fa-solid ' + mode.icon;
+    text.textContent = mode.label;
+    button.setAttribute('title', 'Theme: ' + mode.label.toLowerCase() + ' (click to change)');
+    button.setAttribute('aria-label', 'Theme: ' + mode.label.toLowerCase() + '. Click to change.');
+  }
+
+  button.addEventListener('click', function () {
+    var ids = MODES.map(function (m) { return m.id; });
+    var next = MODES[(ids.indexOf(read()) + 1) % MODES.length].id;
+    write(next);
+    apply(next);
+  });
+
+  apply(read());
+})();
+</script>
+</body>
+</html>
+
+<!-- @partial row -->
+<tr>
+  <td class="icon">{{icon}}</td>
+  <td class="name">{{name}}</td>
+  <td class="desc">{{desc}}</td>
+  <td>{{body}}</td>
+  <td class="ports">{{ports}}</td>
+</tr>
+<!-- @endpartial -->
+
+<!-- @partial button -->
+<a class="btn {{kind}}" href="{{href}}" target="_blank" rel="noreferrer">{{icon}}{{label}}</a>
+<!-- @endpartial -->
+
+<!-- @partial download -->
+<a class="btn {{kind}}" href="{{href}}" download>{{icon}}{{label}}</a>
+<!-- @endpartial -->
+
+<!-- @partial group -->
+<div class="group"><span class="glabel">{{label}}</span>{{buttons}}</div>
+<!-- @endpartial -->
+
+<!-- @partial icon -->
+<i class="{{style}} {{name}}" aria-hidden="true"></i>
+<!-- @endpartial -->
+
+<!-- @partial logo -->
+<img src="{{src}}" alt="">
+<!-- @endpartial -->
+
+<!-- @partial port -->
+<a href="{{href}}">{{label}}</a>
+<!-- @endpartial -->
+
+<!-- @partial empty -->
+<span class="empty">&mdash;</span>
+<!-- @endpartial -->

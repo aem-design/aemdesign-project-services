@@ -1,0 +1,193 @@
+/* Palette note: #0083be and #fdb000 are the brand colours. #0083be is a
+   non-text colour, so the button and link shade is darkened in light mode
+   (#00719f) and lightened with dark text in dark mode (#5cb8e2) to clear
+   WCAG AA 4.5:1 at the 13px bold the buttons use. Swap them back if the
+   brand takes precedence over contrast.
+
+   Light is the default. Dark is applied by data-theme="dark" on <html>, which
+   the inline script in template.html sets before first paint from either the
+   saved preference or the OS setting. The prefers-color-scheme block below is
+   the no-JS fallback: it only applies while no explicit choice is on the
+   element, so a user who picked Light never gets flipped by their OS. */
+
+:root {
+  --ink: #2e1b2f;
+  --line: #e6e1e6;
+  --bg: #faf9fa;
+  --card: #fff;
+  --head: #f3f0f3;
+  --row-hover: #fffdf7;
+  --primary: #00719f;
+  --on-primary: #fff;
+  --accent: #fdb000;
+  --on-accent: #2e1b2f;
+  --muted: #6b5f6c;
+  --faint: #7e707f;
+  --logo-filter: none;
+  color-scheme: light;
+}
+
+/* Values shared by both ways of turning dark on. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --ink: #f2ecf2;
+    --line: #3b2d3d;
+    --bg: #16101a;
+    --card: #221a26;
+    --head: #2b2130;
+    --row-hover: #2e2333;
+    --primary: #5cb8e2;
+    --on-primary: #16101a;
+    --accent: #fdb000;
+    --on-accent: #2e1b2f;
+    --muted: #a798a8;
+    --faint: #9a8b9b;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #f2ecf2;
+  --line: #3b2d3d;
+  --bg: #16101a;
+  --card: #221a26;
+  --head: #2b2130;
+  --row-hover: #2e2333;
+  --primary: #5cb8e2;
+  --on-primary: #16101a;
+  --accent: #fdb000;
+  --on-accent: #2e1b2f;
+  --muted: #a798a8;
+  --faint: #9a8b9b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 2rem 1.5rem 4rem;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.wrap { max-width: 1280px; margin: 0 auto; }
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+h1 { display: flex; align-items: center; gap: .75rem; font-size: 1.6rem; margin: 0 0 .25rem; }
+h1 img { height: 2.6rem; width: auto; }
+.sub { color: var(--muted); margin: 0 0 1.5rem; font-size: .9rem; }
+
+/* --------------------------------------------------------- theme toggle */
+
+.theme {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .4rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.theme:hover { border-color: var(--accent); }
+.theme:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.theme i { font-size: .95em; color: var(--muted); width: 1em; text-align: center; }
+.theme .theme-label { letter-spacing: .02em; }
+
+/* No JS means no working toggle, so do not pretend there is one. */
+html.no-js .theme { display: none; }
+
+/* ---------------------------------------------------------------- table */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td { text-align: left; padding: .7rem .8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th {
+  background: var(--head);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--row-hover); }
+
+td.icon { width: 56px; text-align: center; }
+td.icon img { max-height: 34px; max-width: 34px; }
+td.icon i { font-size: 1.35rem; color: var(--muted); }
+td.name { width: 150px; font-weight: 600; }
+td.desc { width: 210px; color: var(--muted); font-size: .88rem; }
+td.ports { width: 130px; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* Third-party marks are mostly dark-on-transparent, so on a dark table they
+   disappear. A soft light pad keeps brand colours intact - inverting would
+   not. */
+:root[data-theme="dark"] td.icon img,
+:root:not([data-theme]) td.icon img {
+  border-radius: 6px;
+}
+:root[data-theme="dark"] td.icon img { background: #f4f1f4; padding: 2px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) td.icon img { background: #f4f1f4; padding: 2px; }
+}
+
+/* Same problem, larger: a wordmark set in near-black type all but vanishes
+   against a dark header, so the page logo gets the same pad. */
+:root[data-theme="dark"] h1 img { background: #f4f1f4; border-radius: 8px; padding: .25rem .5rem; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) h1 img { background: #f4f1f4; border-radius: 8px; padding: .25rem .5rem; }
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-block;
+  margin: 0 .3rem .3rem 0;
+  padding: .3rem .65rem;
+  border-radius: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.btn.primary { background: var(--primary); color: var(--on-primary); }
+.btn.secondary { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.accent { background: var(--accent); color: var(--on-accent); }
+.btn:hover { filter: brightness(1.06); }
+.btn i { font-size: .95em; opacity: .9; margin-right: .35rem; }
+
+.group { margin-top: .5rem; }
+.glabel {
+  display: block;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--muted);
+  margin-bottom: .25rem;
+}
+
+.empty { color: var(--faint); font-size: .82rem; }
+footer { margin-top: 1.25rem; color: var(--muted); font-size: .8rem; }
+footer a { color: var(--primary); }
